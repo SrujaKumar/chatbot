@@ -8,6 +8,10 @@ type Props = {
   onDeleteMessage?: (id: number) => void;
 };
 
+/**
+ * Component that renders a list of chat messages.
+ * Displays messages with avatars and delete buttons.
+ */
 export default function MessageList({ messages, onDeleteMessage }: Props) {
   return (
     <div className="messages">

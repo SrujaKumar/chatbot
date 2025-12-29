@@ -9,6 +9,10 @@ type Props = {
   onDelete?: (id: number) => void;
 };
 
+/**
+ * Sidebar component displaying list of chat sessions.
+ * Allows users to switch between chats, create new ones, and delete existing ones.
+ */
 export default function ChatList({
   sessions,
   activeId,

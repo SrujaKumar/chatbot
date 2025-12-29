@@ -1,7 +1,19 @@
 
+/**
+ * Normalize text by converting to lowercase and removing punctuation.
+ * @param text - Input text to normalize
+ * @returns Normalized text
+ */
 const normalize = (text: string): string =>
   text.toLowerCase().replace(/[!?.,']/g, "").trim();
 
+/**
+ * Check if normalized text matches any of the provided patterns.
+ * Patterns can match as exact words, at the start, or within the text.
+ * @param normalizedText - Normalized text to check
+ * @param patterns - Array of patterns to match against
+ * @returns True if any pattern matches
+ */
 const matchesAnyPattern = (normalizedText: string, patterns: string[]): boolean =>
   patterns.some(pattern => 
     normalizedText === pattern || 
@@ -9,6 +21,13 @@ const matchesAnyPattern = (normalizedText: string, patterns: string[]): boolean 
     normalizedText.includes(" " + pattern)
   );
 
+/**
+ * Generate a bot reply based on user input.
+ * Uses pattern matching to detect common greetings and phrases.
+ * Falls back to echoing the user's message if no pattern matches.
+ * @param text - User's input text
+ * @returns Bot's reply text
+ */
 export function getReplyForText(text: string): string {
   const normalized = normalize(text);
 

@@ -7,6 +7,10 @@ type Props = {
   onClear?: () => void;
 };
 
+/**
+ * Message input component with send and clear functionality.
+ * Supports Enter key to send messages.
+ */
 export default function Composer({ value, onChange, onSend, onClear }: Props) {
   return (
     <div className="composer">

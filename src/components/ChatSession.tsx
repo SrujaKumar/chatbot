@@ -11,6 +11,10 @@ interface ChatSessionProps {
   onDeleteMessage?: (id: number) => void;
 }
 
+/**
+ * Chat session component that displays messages and handles user input.
+ * Includes auto-scroll functionality and simulated bot responses.
+ */
 export default function ChatSession({
   session,
   onSend,
@@ -25,6 +29,10 @@ export default function ChatSession({
     messagesEnd.current?.scrollIntoView({ behavior: "smooth" });
   }, [session.messages]);
 
+  /**
+   * Send user message and generate bot response.
+   * Bot response is delayed by 700ms to simulate thinking time.
+   */
   const send = () => {
     if (!input.trim()) return;
 
@@ -32,7 +40,7 @@ export default function ChatSession({
     onSend(userMsg);
     setInput("");
 
-    // Simulate bot thinking time
+    // Simulate bot thinking time before responding
     setTimeout(() => {
       const replyText = getReplyForText(userMsg.text);
       const botMsg: Message = {
