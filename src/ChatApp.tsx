@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import ChatList from "./components/ChatList";
 import ChatSession from "./components/ChatSession";
 import { Message, Session } from "./types";
 
 export default function ChatApp() {
+  const navigate = useNavigate();
+  const { chatId: chatParam } = useParams<{ chatId: string }>();
+  
+  const chatId = chatParam?.replace('chat', '') || '';
+  
   const initial = (): Session[] => {
     try {
       const raw = localStorage.getItem("chat_sessions");
@@ -23,7 +29,7 @@ export default function ChatApp() {
   };
 
   const [sessions, setSessions] = useState<Session[]>(initial);
-  const [activeId, setActiveId] = useState<number>(sessions[0]?.id ?? 1);
+  const activeId = chatId ? parseInt(chatId) : sessions[0]?.id ?? 1;
 
   const addMessage = (sessionId: number, message: Message) => {
     setSessions((prev) =>
@@ -44,11 +50,8 @@ export default function ChatApp() {
         title: `Chat ${idx + 1}`,
       }));
 
-      // Update active session if needed
       if (reindexed.length > 0 && !reindexed.find((s) => s.id === activeId)) {
-        setActiveId(reindexed[0].id);
-      } else if (reindexed.length === 0) {
-        setActiveId(-1);
+        navigate(`/chat${reindexed[0].id}`);
       }
 
       return reindexed;
@@ -72,10 +75,29 @@ export default function ChatApp() {
       ],
     };
     setSessions((prev) => [...prev, newSession]);
-    setActiveId(nextId);
+    navigate(`/chat${nextId}`);
+  };
+
+  const selectSession = (id: number) => {
+    navigate(`/chat${id}`);
   };
 
   const activeSession = sessions.find((s) => s.id === activeId);
+
+  const deleteMessage = (messageId: number) => {
+    if (!activeSession) return;
+    setSessions((prev) =>
+      prev.map((s) =>
+        s.id === activeSession.id
+          ? { ...s, messages: s.messages.filter((m) => m.id !== messageId) }
+          : s
+      )
+    );
+  };
+
+  useEffect(() => {
+    localStorage.setItem("chat_sessions", JSON.stringify(sessions));
+  }, [sessions]);
 
   return (
     <div className="container">
@@ -84,7 +106,7 @@ export default function ChatApp() {
         <ChatList
           sessions={sessions}
           activeId={activeId}
-          onSelect={setActiveId}
+          onSelect={selectSession}
           onCreate={createSession}
           onDelete={removeSession}
         />
@@ -94,20 +116,14 @@ export default function ChatApp() {
         {activeSession ? (
           <ChatSession
             session={activeSession}
-            onSend={(msg) => addMessage(activeId, msg)}
-            onClear={() => clearMessages(activeId)}
-            onDeleteMessage={(mid) =>
-              setSessions((prev) =>
-                prev.map((s) =>
-                  s.id === activeId
-                    ? { ...s, messages: s.messages.filter((m) => m.id !== mid) }
-                    : s
-                )
-              )
-            }
+            onSend={(msg) => addMessage(activeSession.id, msg)}
+            onClear={() => clearMessages(activeSession.id)}
+            onDeleteMessage={deleteMessage}
           />
         ) : (
-          <div className="empty">No session selected</div>
+          <div style={{ padding: "20px", textAlign: "center" }}>
+            Select a chat or create a new one
+          </div>
         )}
       </div>
     </div>
